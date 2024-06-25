@@ -29,4 +29,4 @@ __spec_version__ = (
 
 # Import all submodules.
 from . import sub_dir
-from .some_utils import *
+from . import some_utils

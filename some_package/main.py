@@ -1,6 +1,5 @@
 import time
 import argparse
-from some_package.some_utils import print_message
 
 '''
 Dummy script that just prints a message to terminal every 3 seconds.
@@ -8,7 +7,6 @@ Dummy script that just prints a message to terminal every 3 seconds.
 
 def main(user, key, port):
     while True:
-        print_message()
         print(f"Username: {user}, Key: {key}, Port: {port}")
         time.sleep(3)
 
@@ -20,4 +18,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args.name, args.key, args.port)
+    main(args.user, args.key, args.port)
