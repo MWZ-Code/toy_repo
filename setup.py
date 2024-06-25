@@ -63,7 +63,7 @@ with codecs.open(
     version_string = version_match.group(1)
 
 setup(
-    name="toy_repo",
+    name="some_package",
     version=version_string,
     description="Repository for learning about code formatters, auto_update scripts, and general dev ops",
     long_description=long_description,
