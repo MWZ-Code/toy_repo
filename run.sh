@@ -239,7 +239,7 @@ check_and_restart_pm2() {
 
     echo "Running $script_path with the following pm2 config:"
 
-    joined_args=$(printf "\"%s\"," "${proc_args[@]}")
+    joined_args=$(printf "\'%s\'," "${proc_args[@]}")
     joined_args=${joined_args%,}
 
     echo "module.exports = {
@@ -249,7 +249,7 @@ check_and_restart_pm2() {
         interpreter: 'python3',
         min_uptime: '5m',
         max_restarts: '5',
-        args: [${proc_args[@]%,}]
+        args: [$joined_args]
       }]
     }" > $proc_name.app.config.js
 
