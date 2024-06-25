@@ -279,7 +279,8 @@ echo "Current local version: $current_version"
 check_and_restart_pm2() {
     local proc_name=$1
     local script_path=$2
-    local proc_args=("${!3}")
+    shift 2
+    local proc_args=("${@}")
 
     if pm2 status | grep -q $proc_name; then
         echo "The script $script_path is already running with pm2 under the name $proc_name. Stopping and restarting..."
@@ -288,7 +289,7 @@ check_and_restart_pm2() {
 
     echo "Running $script_path with the following pm2 config:"
 
-    joined_args=$(printf "'%s'," "${proc_args[@]}")
+    joined_args=$(printf "\"%s\"," "${proc_args[@]}")
     joined_args=${joined_args%,}
 
     echo "module.exports = {
@@ -306,7 +307,7 @@ check_and_restart_pm2() {
     pm2 start $proc_name.app.config.js
 }
 
-check_and_restart_pm2 "$proc_name" "$script" args[@]
+check_and_restart_pm2 "$proc_name" "$script" ${args[@]}
 
 # Continuous checking and updating logic
 while true; do
@@ -338,15 +339,13 @@ while true; do
         if git pull origin $branch; then
             echo "New version published. Updating the local copy."
             pip install -e .
-            check_and_restart_pm2 "$proc_name" "$script" args[@]
+            check_and_restart_pm2 "$proc_name" "$script" ${args[@]}
             current_version=$(read_version_value)
             echo "Update completed. Continuing monitoring..."
         else
             echo "Please stash your changes using git stash."
         fi
     else
-        # check that the validator script is still running
-        check_and_restart_pm2 "$proc_name" "$script" args[@]
         echo "You are up-to-date with the latest version."
     fi
     sleep 45
