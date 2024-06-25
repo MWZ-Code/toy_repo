@@ -71,15 +71,15 @@ setup(
     url="https://github.com/Mak-Wei-Zheng/toy_repo",
     author="Mak Wei Zheng", 
     include_package_data=True,
-    author_email="",  # TODO(developer): Change this value to your module subnet author email.
+    author_email="",  # TODO: Change this value to your module subnet author email.
     license="MIT",
     python_requires=">=3.8",
     install_requires=requirements,
+    packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
-        # Pick your license as you wish
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.8",
