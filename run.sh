@@ -5,7 +5,7 @@ script="some_package/main.py" # replace this with the relative script path
 autoRunLoc=$(readlink -f "$0")
 proc_name="test_print_script" 
 args=()
-version_location="./some_package/__init__.py"
+version_location="some_package/__init__.py"
 version="__version__"
 repository="Mak-Wei-Zheng/toy_repo"
 repository_path="https://github.com/$repository"
@@ -106,29 +106,100 @@ check_package_installed() {
     fi
 }
 
+# check_variable_value_on_github() {
+#     local repo="$1"
+#     local file_path="$2"
+#     local variable_name="$3"
+#     local branch="$4"
+
+#     echo "Received arguments: repo - $repo, file_path - $file_path, variable_name - $variable_name, branch - $branch"
+
+# #     local url="https://api.github.com/repos/$repo/contents/$file_path?ref=$branch"
+# #     local response=$(curl -s "$url")
+
+# #     echo "$url"
+
+# #     # Check if the response contains an error message
+# #     if [[ $response =~ "message" ]]; then
+# #         echo "Error: Failed to retrieve file contents from GitHub."
+# #         return 1
+# #     fi
+
+# #     # Extract the base64 content and decode it
+# #     json_content=$(echo "$response" | jq -r '.content' | base64 --decode)
+
+# #     # Extract the "subnet_version" value using jq
+# #     subnet_version=$(echo "$json_content" | jq -r '.subnet_version')
+
+# #     # Print the value
+# #     echo "$subnet_version"
+# # }
+#     local url="https://api.github.com/repos/$repo/contents/$file_path?ref=$branch"
+#     local response=$(curl -s "$url")
+
+#     echo "URL: $url"
+
+#     # Check if the response contains an error message
+#     if [[ $response =~ "message" ]]; then
+#         echo "Error: Failed to retrieve file contents from GitHub."
+#         return 1
+#     fi
+
+#     # Sanitize JSON content to handle invalid control characters
+#     sanitized_response=$(echo "$response" | tr -d '\000-\037')
+
+#     # Extract the base64 content and decode it
+#     json_content=$(echo "$sanitized_response" | jq -r '.content' | base64 --decode)
+
+#     # Extract the desired variable value using grep and awk
+#     variable_value=$(echo "$json_content" | grep "$variable_name" | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d '"' | tr -d "'")
+
+#     # Print the value
+#     echo "$variable_value"
+# }
+
 check_variable_value_on_github() {
     local repo="$1"
     local file_path="$2"
     local variable_name="$3"
     local branch="$4"
 
+    # Redirect debug statements to stderr
+    echo "Debugging arguments:" >&2
+    echo "Repo: $repo" >&2
+    echo "File Path: $file_path" >&2
+    echo "Variable Name: $variable_name" >&2
+    echo "Branch: $branch" >&2
+
     local url="https://api.github.com/repos/$repo/contents/$file_path?ref=$branch"
     local response=$(curl -s "$url")
 
+    echo "URL: $url" >&2
+
     # Check if the response contains an error message
     if [[ $response =~ "message" ]]; then
-        echo "Error: Failed to retrieve file contents from GitHub."
+        echo "Error: Failed to retrieve file contents from GitHub." >&2
         return 1
     fi
 
+    # Sanitize JSON content to handle invalid control characters
+    sanitized_response=$(echo "$response" | tr -d '\000-\037')
+
     # Extract the base64 content and decode it
-    json_content=$(echo "$response" | jq -r '.content' | base64 --decode)
+    json_content=$(echo "$sanitized_response" | jq -r '.content' | base64 --decode)
 
-    # Extract the "subnet_version" value using jq
-    subnet_version=$(echo "$json_content" | jq -r '.subnet_version')
+    # Extract the desired variable value using grep and awk
+    variable_line=$(echo "$json_content" | grep -E "^${variable_name}\s*=\s*")
+    if [ -n "$variable_line" ]; then
+        variable_value=$(echo "$variable_line" | awk -F '=' '{print $2}' | tr -d '[:space:]')
+        variable_value=$(strip_quotes "$variable_value")
+    else
+        echo "Variable not found" >&2
+        return 1
+    fi
 
-    # Print the value
-    echo "$subnet_version"
+    # Output only the variable value
+    echo "$variable_value"
 }
 
 strip_quotes() {
@@ -138,11 +209,22 @@ strip_quotes() {
     local stripped="${input#\"}"
     stripped="${stripped%\"}"
 
-    echo "$stripped"    
+    echo "$stripped"
 }
 
 read_version_value() {
-    jq -r $version "$version_location"
+    # Read each line in the file
+    while IFS= read -r line; do
+        # Check if the line contains the variable name
+        if [[ "$line" == *"$version"* ]]; then
+            # Extract the value of the variable
+            local value=$(echo "$line" | awk -F '=' '{print $2}' | tr -d ' ')
+            strip_quotes $value
+            return 
+        fi
+    done < "$version_location"
+
+    echo "found version $value"
 }
 
 check_package_installed "jq"
@@ -192,6 +274,7 @@ echo "Watching branch: $branch"
 echo "PM2 process names: $proc_name, $generate_proc_name"
 
 current_version=$(read_version_value)
+echo "Current local version: $current_version"
 
 # Function to check and restart pm2 processes
 check_and_restart_pm2() {
@@ -228,15 +311,17 @@ check_and_restart_pm2() {
 while true; do
     # Get the current minute
     current_minute=$(date +'%M')
+    echo "Current minute: $current_minute"
 
     # Check if the current minute is even
     if [ $((10#$current_minute % 2)) -ne 0 ]; then
-        sleep 5 # Sleep for 5 seconds and check again
+        sleep 30 # Sleep for 5 seconds and check again
+        echo "slept for 30 seconds"
         continue
     fi
 
     # Proceed with checks only at the 30-minute mark
-    latest_version=$(check_variable_value_on_github $respository $version_location $version $branch)
+    latest_version=$(check_variable_value_on_github $repository $version_location $version $branch)
 
     while [ -z "$latest_version" ]; do
         echo "Waiting for latest version to be set..."
@@ -261,5 +346,5 @@ while true; do
     else
         echo "You are up-to-date with the latest version."
     fi
-    sleep 300
+    sleep 45
 done
