@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Initialize variables
-script="test_update"
+script="some_package/main.py" # replace this with the relative script path
 autoRunLoc=$(readlink -f "$0")
 proc_name="test_print_script" 
 args=()
