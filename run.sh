@@ -230,8 +230,6 @@ check_and_restart_pm2() {
     shift 2
     local proc_args=("${@}")
 
-    echo "$proc_args"
-
     if pm2 status | grep -q $proc_name; then
         echo "The script $script_path is already running with pm2 under the name $proc_name. Stopping and restarting..."
         pm2 delete $proc_name
@@ -239,10 +237,8 @@ check_and_restart_pm2() {
 
     echo "Running $script_path with the following pm2 config:"
 
-    joined_args=$(printf "\"%s\"," "${proc_args[@]}")
-    joined_args=${joined_args%,}
-
-    echo "$joined_args"
+    # joined_args=$(printf "\"%s\"," "${proc_args[@]}")
+    # joined_args=${joined_args%,}
 
     echo "module.exports = {
       apps : [{
@@ -251,7 +247,7 @@ check_and_restart_pm2() {
         interpreter: 'python3',
         min_uptime: '5m',
         max_restarts: '5',
-        args: [$joined_args]
+        args: [$proc_args]
       }]
     }" > $proc_name.app.config.js
 
