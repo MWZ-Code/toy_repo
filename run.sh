@@ -11,7 +11,7 @@ repository_path="https://github.com/$repository"
 
 old_args=$@
 
-echo "$old_args"
+# echo "$old_args"
 
 # Check if pm2 is installed
 # if ! command -v pm2 &> /dev/null
@@ -230,8 +230,6 @@ check_and_restart_pm2() {
     shift 2
     local proc_args=("${@}")
 
-    echo "$proc_args"
-
     if pm2 status | grep -q $proc_name; then
         echo "The script $script_path is already running with pm2 under the name $proc_name. Stopping and restarting..."
         pm2 delete $proc_name
@@ -249,7 +247,7 @@ check_and_restart_pm2() {
         interpreter: 'python3',
         min_uptime: '5m',
         max_restarts: '5',
-        args: [$proc_args]
+        args: [$joined_args]
       }]
     }" > $proc_name.app.config.js
 
