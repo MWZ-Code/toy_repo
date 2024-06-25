@@ -230,6 +230,8 @@ check_and_restart_pm2() {
     shift 2
     local proc_args=("${@}")
 
+    echo "$proc_args"
+
     if pm2 status | grep -q $proc_name; then
         echo "The script $script_path is already running with pm2 under the name $proc_name. Stopping and restarting..."
         pm2 delete $proc_name
