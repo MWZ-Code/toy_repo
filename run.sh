@@ -249,7 +249,7 @@ check_and_restart_pm2() {
         interpreter: 'python3',
         min_uptime: '5m',
         max_restarts: '5',
-        args: [${proc_args[@]}]
+        args: [${proc_args[@]%,}]
       }]
     }" > $proc_name.app.config.js
 
