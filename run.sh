@@ -3,11 +3,11 @@
 # Initialize variables
 script="test_update.py"
 autoRunLoc=$(readlink -f "$0")
-proc_name="graph_validator" 
+proc_name="test_print_script" 
 args=()
-version_location="./graph_explorer/__init__.py"
+version_location="./some_package/__init__.py"
 version="__version__"
-repository="sherwinseah/Moonvault-Subnet"
+repository="Mak-Wei-Zheng/toy_repo"
 repository_path="https://github.com/$repository"
 
 old_args=$@
@@ -226,9 +226,11 @@ check_and_restart_pm2() {
 
 # Continuous checking and updating logic
 while true; do
-    # Check for updates to the code on an hourly basis
+    # Get the current minute
     current_minute=$(date +'%M')
-    if [$current_minute -gt 0]; then
+
+    # Check if the current minute is even
+    if [ $((10#$current_minute % 2)) -ne 0 ]; then
         sleep 5 # Sleep for 5 seconds and check again
         continue
     fi
