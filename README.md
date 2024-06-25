@@ -9,7 +9,7 @@ currently, run.sh takes in arguments: name, key, and port and prints them out to
 The version tracking will be done through changing the random message function
 
 ```bash
-pm2 start run.sh --user "ExampleName" --key "ExampleKey" --port 1234
+pm2 start run.sh --name test_print_script -- --user "ExampleName" --key "ExampleKey" --port 1234
 ```
 
 ### Testing code formatters

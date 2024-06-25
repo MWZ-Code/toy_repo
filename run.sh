@@ -242,6 +242,8 @@ check_and_restart_pm2() {
     joined_args=$(printf "\"%s\"," "${proc_args[@]}")
     joined_args=${joined_args%,}
 
+    echo "$joined_args"
+
     echo "module.exports = {
       apps : [{
         name   : '$proc_name',
