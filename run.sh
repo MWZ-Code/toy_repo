@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Initialize variables
-script="test_update.py"
+script="test_update"
 autoRunLoc=$(readlink -f "$0")
 proc_name="test_print_script" 
 args=()
