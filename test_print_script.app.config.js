@@ -5,6 +5,6 @@ module.exports = {
         interpreter: 'python3',
         min_uptime: '5m',
         max_restarts: '5',
-        args: ["'--name'","'test_print_script'","'--'","'--user'","'ExampleName'","'--key'","'ExampleKey'","'--port'","'1234'"]
+        args: [""]
       }]
     }

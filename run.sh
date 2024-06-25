@@ -105,58 +105,6 @@ check_package_installed() {
     fi
 }
 
-# check_variable_value_on_github() {
-#     local repo="$1"
-#     local file_path="$2"
-#     local variable_name="$3"
-#     local branch="$4"
-
-#     echo "Received arguments: repo - $repo, file_path - $file_path, variable_name - $variable_name, branch - $branch"
-
-# #     local url="https://api.github.com/repos/$repo/contents/$file_path?ref=$branch"
-# #     local response=$(curl -s "$url")
-
-# #     echo "$url"
-
-# #     # Check if the response contains an error message
-# #     if [[ $response =~ "message" ]]; then
-# #         echo "Error: Failed to retrieve file contents from GitHub."
-# #         return 1
-# #     fi
-
-# #     # Extract the base64 content and decode it
-# #     json_content=$(echo "$response" | jq -r '.content' | base64 --decode)
-
-# #     # Extract the "subnet_version" value using jq
-# #     subnet_version=$(echo "$json_content" | jq -r '.subnet_version')
-
-# #     # Print the value
-# #     echo "$subnet_version"
-# # }
-#     local url="https://api.github.com/repos/$repo/contents/$file_path?ref=$branch"
-#     local response=$(curl -s "$url")
-
-#     echo "URL: $url"
-
-#     # Check if the response contains an error message
-#     if [[ $response =~ "message" ]]; then
-#         echo "Error: Failed to retrieve file contents from GitHub."
-#         return 1
-#     fi
-
-#     # Sanitize JSON content to handle invalid control characters
-#     sanitized_response=$(echo "$response" | tr -d '\000-\037')
-
-#     # Extract the base64 content and decode it
-#     json_content=$(echo "$sanitized_response" | jq -r '.content' | base64 --decode)
-
-#     # Extract the desired variable value using grep and awk
-#     variable_value=$(echo "$json_content" | grep "$variable_name" | awk -F '=' '{print $2}' | tr -d '[:space:]' | tr -d '"' | tr -d "'")
-
-#     # Print the value
-#     echo "$variable_value"
-# }
-
 check_variable_value_on_github() {
     local repo="$1"
     local file_path="$2"
@@ -307,6 +255,7 @@ check_and_restart_pm2() {
     pm2 start $proc_name.app.config.js
 }
 
+echo "${args[@]}"
 check_and_restart_pm2 "$proc_name" "$script" ${args[@]}
 
 # Continuous checking and updating logic
