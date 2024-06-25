@@ -2,7 +2,6 @@
 
 # Initialize variables
 script="some_package/main.py" # replace this with the relative script path
-autoRunLoc=$(readlink -f "$0")
 proc_name="test_print_script" 
 args=()
 version_location="some_package/__init__.py"
@@ -307,6 +306,8 @@ check_and_restart_pm2() {
     pm2 start $proc_name.app.config.js
 }
 
+check_and_restart_pm2 "$proc_name" "$script" args[@]
+
 # Continuous checking and updating logic
 while true; do
     # Get the current minute
@@ -344,6 +345,8 @@ while true; do
             echo "Please stash your changes using git stash."
         fi
     else
+        # check that the validator script is still running
+        check_and_restart_pm2 "$proc_name" "$script" args[@]
         echo "You are up-to-date with the latest version."
     fi
     sleep 45
